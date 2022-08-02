@@ -4,6 +4,7 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const bp = require("body-parser");
 const port = process.env.PORT || 8080;
 
@@ -16,27 +17,23 @@ dbConnect();
 
 app.post("/register", (request, response) => {
   console.log(request.body);
-  // hash the password
+
   bcrypt
     .hash(request.body.password, 10)
     .then((hashedPassword) => {
-      // create a new user instance and collect the data
       const user = new User({
         email: request.body.email,
         password: hashedPassword,
       });
 
-      // save the new user
       user
         .save()
-        // return success if the new user is added to the database successfully
         .then((result) => {
           response.status(201).send({
             message: "User Created Successfully",
             result,
           });
         })
-        // catch error if the new user wasn't added successfully to the database
         .catch((error) => {
           response.status(500).send({
             message: "Error creating user",
@@ -44,10 +41,52 @@ app.post("/register", (request, response) => {
           });
         });
     })
-    // catch error if the password hash isn't successful
     .catch((e) => {
       response.status(500).send({
         message: "Password was not hashed successfully",
+        e,
+      });
+    });
+});
+
+// login endpoint
+app.post("/login", (request, response) => {
+  User.findOne({ email: request.body.email })
+
+    .then((user) => {
+      bcrypt
+        .compare(request.body.password, user.password)
+        .then((passwordCheck) => {
+          if (!passwordCheck) {
+            return response.status(400).send({
+              message: "Passwords does not match",
+              error,
+            });
+          }
+          const token = jwt.sign(
+            {
+              userId: user._id,
+              userEmail: user.email,
+            },
+            "RANDOM-TOKEN",
+            { expiresIn: "24h" }
+          );
+          response.status(200).send({
+            message: "Login Successful",
+            email: user.email,
+            token,
+          });
+        })
+        .catch((error) => {
+          response.status(400).send({
+            message: "Passwords does not match",
+            error,
+          });
+        });
+    })
+    .catch((e) => {
+      response.status(404).send({
+        message: "Email not found",
         e,
       });
     });
