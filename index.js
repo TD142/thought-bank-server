@@ -7,6 +7,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const bp = require("body-parser");
 const auth = require("./db/auth");
+const Post = require("./db/postModel");
 const port = process.env.PORT || 8080;
 
 const app = express();
@@ -63,7 +64,6 @@ app.post("/register", (request, response) => {
     });
 });
 
-// login endpoint
 app.post("/login", (request, response) => {
   User.findOne({ email: request.body.email })
 
@@ -104,6 +104,16 @@ app.post("/login", (request, response) => {
         e,
       });
     });
+});
+
+app.post("/posts", async (req, res) => {
+  const newPost = new Post(req.body);
+  try {
+    const SavedPost = await newPost.save();
+    res.status(200).json(savedPost);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 app.get("/free-endpoint", (request, response) => {
