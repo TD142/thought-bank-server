@@ -6,6 +6,7 @@ require("dotenv").config();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const bp = require("body-parser");
+const auth = require("./db/auth");
 const port = process.env.PORT || 8080;
 
 const app = express();
@@ -14,6 +15,19 @@ app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
 
 dbConnect();
+
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+  );
+  next();
+});
 
 app.post("/register", (request, response) => {
   console.log(request.body);
@@ -90,6 +104,14 @@ app.post("/login", (request, response) => {
         e,
       });
     });
+});
+
+app.get("/free-endpoint", (request, response) => {
+  response.json({ message: "You are free to access me anytime" });
+});
+
+app.get("/auth-endpoint", auth, (request, response) => {
+  response.json({ message: "You are authorized to access me" });
 });
 
 app.listen(port, () => {
