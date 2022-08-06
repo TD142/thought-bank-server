@@ -3,10 +3,12 @@ const bcrypt = require("bcrypt");
 const router = express.Router();
 const User = require("../db/userModel");
 router.post("/", (request, response) => {
+  console.log(request.body.password);
   bcrypt
     .hash(request.body.password, 10)
     .then((hashedPassword) => {
       const user = new User({
+        username: request.body.username,
         email: request.body.email,
         password: hashedPassword,
       });
