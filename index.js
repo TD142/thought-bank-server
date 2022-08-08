@@ -5,6 +5,7 @@ require("dotenv").config();
 const registerRoutes = require("./routes/register");
 const loginRoutes = require("./routes/login");
 const postsRoutes = require("./routes/posts");
+const userRoutes = require("./routes/user");
 const bp = require("body-parser");
 const auth = require("./db/auth");
 
@@ -30,6 +31,7 @@ app.use((req, res, next) => {
 app.use("/register", registerRoutes);
 app.use("/login", loginRoutes);
 app.use("/posts", postsRoutes);
+app.use("/user", userRoutes);
 
 dbConnect();
 
