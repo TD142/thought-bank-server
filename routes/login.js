@@ -30,6 +30,7 @@ router.post("/", (request, response) => {
             message: "Login Successful",
             user: user.username,
             email: user.email,
+            id: user._id,
             token,
           });
         })

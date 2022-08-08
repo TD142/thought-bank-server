@@ -6,6 +6,7 @@ const registerRoutes = require("./routes/register");
 const loginRoutes = require("./routes/login");
 const postsRoutes = require("./routes/posts");
 const userRoutes = require("./routes/user");
+const multer = require("multer");
 const bp = require("body-parser");
 const auth = require("./db/auth");
 
@@ -32,15 +33,30 @@ app.use("/register", registerRoutes);
 app.use("/login", loginRoutes);
 app.use("/posts", postsRoutes);
 app.use("/user", userRoutes);
+app.use("/images", express.static("/images"));
 
 dbConnect();
 
-app.get("/free-endpoint", (request, response) => {
-  response.json({ message: "You are free to access me anytime" });
+// app.get("/free-endpoint", (request, response) => {
+//   response.json({ message: "You are free to access me anytime" });
+// });
+
+// app.get("/auth-endpoint", auth, (request, response) => {
+//   response.json({ message: "You are authorized to access me" });
+// });
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "images");
+  },
+  filename: (req, file, cb) => {
+    cb(null, req.body.name);
+  },
 });
 
-app.get("/auth-endpoint", auth, (request, response) => {
-  response.json({ message: "You are authorized to access me" });
+const upload = multer({ storage: storage });
+app.post("/api/upload", upload.single("file"), (req, res) => {
+  res.status(200).json("File has been uploaded");
 });
 
 app.listen(port, () => {
