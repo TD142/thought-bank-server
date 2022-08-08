@@ -33,7 +33,7 @@ app.use("/register", registerRoutes);
 app.use("/login", loginRoutes);
 app.use("/posts", postsRoutes);
 app.use("/user", userRoutes);
-app.use("/images", express.static("/images"));
+app.use("/public", express.static("./public"));
 
 dbConnect();
 
@@ -47,15 +47,15 @@ dbConnect();
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "images");
+    cb(null, "public");
   },
   filename: (req, file, cb) => {
-    cb(null, req.body.name);
+    cb(null, "hello.jpeg");
   },
 });
 
 const upload = multer({ storage: storage });
-app.post("/api/upload", upload.single("file"), (req, res) => {
+app.post("/upload", upload.single("file"), (req, res) => {
   res.status(200).json("File has been uploaded");
 });
 
