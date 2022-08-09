@@ -3,6 +3,7 @@ const router = express.Router();
 const Post = require("../db/postModel");
 
 router.post("/", async (req, res) => {
+  console.log(req.body);
   const newPost = new Post(req.body);
   try {
     const SavedPost = await newPost.save();
