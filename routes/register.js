@@ -2,8 +2,23 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const router = express.Router();
 const User = require("../db/userModel");
-router.post("/", (request, response) => {
-  console.log(request.body.password);
+router.post("/", async (request, response) => {
+  const userDetails = await User.findOne({ username: request.body.username });
+
+  const errors = {};
+
+  if (userDetails.username === request.body.username) {
+    errors.userError = "User already exists";
+  }
+
+  if (userDetails.email === request.body.email) {
+    errors.emailError = "Email already exists";
+  }
+
+  if (errors.userError || errors.emailError) {
+    return response.status(409).send(errors);
+  }
+
   bcrypt
     .hash(request.body.password, 10)
     .then((hashedPassword) => {
