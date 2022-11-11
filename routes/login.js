@@ -5,7 +5,6 @@ const User = require("../db/userModel");
 const jwt = require("jsonwebtoken");
 
 router.post("/", (request, response) => {
-  console.log(request.body.password);
   User.findOne({ email: request.body.email })
 
     .then((user) => {

@@ -4,15 +4,20 @@ const router = express.Router();
 const User = require("../db/userModel");
 router.post("/", async (request, response) => {
   const userDetails = await User.findOne({ username: request.body.username });
+  const userEmail = await User.findOne({ email: request.body.email });
 
   const errors = {};
 
-  if (userDetails.username === request.body.username) {
-    errors.userError = "User already exists";
+  if (userDetails) {
+    if (userDetails.username === request.body.username) {
+      errors.userError = "User already exists";
+    }
   }
 
-  if (userDetails.email === request.body.email) {
-    errors.emailError = "Email already exists";
+  if (userEmail) {
+    if (userEmail.email === request.body.email) {
+      errors.emailError = "Email already exists";
+    }
   }
 
   if (errors.userError || errors.emailError) {
